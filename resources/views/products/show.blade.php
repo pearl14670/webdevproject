@@ -103,6 +103,13 @@
                                     </button>
                                 </div>
                             @endif
+
+                            <form action="{{ route('wishlist.add', $product) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="bi bi-heart"></i> Add to Wishlist
+                                </button>
+                            </form>
                         </div>
                     </div>
 

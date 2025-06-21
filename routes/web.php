@@ -9,6 +9,9 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\LaundryOrderController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\AdminOrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -54,8 +57,8 @@ Route::middleware('auth')->group(function () {
 
     // Wishlist routes
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
-    Route::post('/wishlist/{product}', [WishlistController::class, 'store'])->name('wishlist.store');
-    Route::delete('/wishlist/{product}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
+    Route::post('/wishlist/{product}', [WishlistController::class, 'add'])->name('wishlist.add');
+    Route::delete('/wishlist/{product}', [WishlistController::class, 'remove'])->name('wishlist.remove');
 });
 
 // Product routes
@@ -65,6 +68,15 @@ Route::get('/products/{product}', [ProductController::class, 'show'])->name('pro
 // Category routes
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
+
+// Laundry Routes
+Route::middleware(['auth'])->prefix('laundry')->name('laundry.')->group(function () {
+    Route::get('/orders', [LaundryOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/create', [LaundryOrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [LaundryOrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}', [LaundryOrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/cancel', [LaundryOrderController::class, 'cancel'])->name('orders.cancel');
+});
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -106,6 +118,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
         Route::delete('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'destroy'])->name('profile.destroy');
     });
+});
+
+// Admin Laundry Routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('services', ServiceController::class);
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::put('/orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
 });
 
 require __DIR__.'/auth.php';

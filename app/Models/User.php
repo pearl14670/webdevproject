@@ -148,6 +148,24 @@ class User extends Authenticatable
         });
     }
 
+    public function wishlistProducts()
+    {
+        return $this->belongsToMany(Product::class, 'wishlists')
+                    ->withTimestamps();
+    }
+
+    public function laundryOrders()
+    {
+        return $this->hasMany(LaundryOrder::class);
+    }
+
+    public function getActiveOrdersAttribute()
+    {
+        return $this->laundryOrders()
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->get();
+    }
+
     protected static function booted()
     {
         static::created(function ($user) {
